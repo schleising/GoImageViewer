@@ -13,6 +13,22 @@ import (
 const (
 	width  = 500
 	height = 500
+
+	vertexShaderSource = `
+    #version 410
+    in vec3 vp;
+    void main() {
+        gl_Position = vec4(vp, 1.0);
+    }
+` + "\x00"
+
+	fragmentShaderSource = `
+    #version 410
+    out vec4 frag_colour;
+    void main() {
+        frag_colour = vec4(0.118, 0.565, 1, 1);
+    }
+` + "\x00"
 )
 
 var (
@@ -22,22 +38,6 @@ var (
 		0.5, -0.5, 0, // right
 	}
 )
-
-var vertexShaderSource = `
-    #version 410
-    in vec3 vp;
-    void main() {
-        gl_Position = vec4(vp, 1.0);
-    }
-` + "\x00"
-
-var fragmentShaderSource = `
-    #version 410
-    out vec4 frag_colour;
-    void main() {
-        frag_colour = vec4(0.118, 0.565, 1, 1);
-    }
-` + "\x00"
 
 func main() {
 	runtime.LockOSThread()
@@ -84,18 +84,18 @@ func initOpenGL() uint32 {
 	version := gl.GoStr(gl.GetString(gl.VERSION))
 	log.Println("OpenGL version", version)
 
-    vertexShader, err := compileShader(vertexShaderSource, gl.VERTEX_SHADER)
-    if err != nil {
-        panic(err)
-    }
-    fragmentShader, err := compileShader(fragmentShaderSource, gl.FRAGMENT_SHADER)
-    if err != nil {
-        panic(err)
-    }
-    
+	vertexShader, err := compileShader(vertexShaderSource, gl.VERTEX_SHADER)
+	if err != nil {
+		panic(err)
+	}
+	fragmentShader, err := compileShader(fragmentShaderSource, gl.FRAGMENT_SHADER)
+	if err != nil {
+		panic(err)
+	}
+
 	prog := gl.CreateProgram()
-    gl.AttachShader(prog, vertexShader)
-    gl.AttachShader(prog, fragmentShader)    
+	gl.AttachShader(prog, vertexShader)
+	gl.AttachShader(prog, fragmentShader)
 	gl.LinkProgram(prog)
 	return prog
 }
