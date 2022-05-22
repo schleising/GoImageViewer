@@ -81,18 +81,22 @@ func main() {
 
 	cells := makeCells()
 
-    for !window.ShouldClose() {
-        t := time.Now()
+	lastUpdateTime := time.Now()
 
-        for x := range cells {
-            for _, c := range cells[x] {
-                c.checkState(cells)
-            }
-        }
-        
-        draw(cells, window, program)
-        
-        time.Sleep(time.Second/time.Duration(fps) - time.Since(t))
+    for !window.ShouldClose() {
+		if time.Since(lastUpdateTime) > time.Second/time.Duration(fps){
+			lastUpdateTime = time.Now()
+
+			for x := range cells {
+				for _, c := range cells[x] {
+					c.checkState(cells)
+				}
+			}
+			
+			draw(cells, window, program)
+			
+		}
+		glfw.PollEvents()
     }
 }
 
@@ -114,6 +118,7 @@ func initGlfw() *glfw.Window {
 	}
 	window.MakeContextCurrent()
 
+	glfw.SwapInterval(1)
 	window.SetKeyCallback(keyCallBack)
 
 	return window
@@ -162,7 +167,6 @@ func draw(cells [][]*cell, window *glfw.Window, program uint32) {
 		}
 	}
 
-	glfw.PollEvents()
 	window.SwapBuffers()
 }
 
