@@ -32,10 +32,16 @@ const (
 )
 
 var (
-	triangle = []float32{
+	triangle1 = []float32{
 		-0.5, 0.5, 0, // top
 		-0.5, -0.5, 0, // left
 		0.5, -0.5, 0, // right
+	}
+
+	triangle2 = []float32{
+		-0.5, 0.5, 0,
+		0.5, 0.5, 0,
+		0.5, -0.5, 0,
 	}
 )
 
@@ -47,11 +53,12 @@ func main() {
 
 	program := initOpenGL()
 
-	vao := makeVao(triangle)
+	var vaoSlice []uint32
+
+	vaoSlice = append(vaoSlice, makeVao(triangle1), makeVao(triangle2))
 
 	for !window.ShouldClose() {
-		// Do OpenGL stuff.
-		draw(vao, window, program)
+		draw(vaoSlice, window, program)
 	}
 }
 
@@ -100,12 +107,14 @@ func initOpenGL() uint32 {
 	return prog
 }
 
-func draw(vao uint32, window *glfw.Window, program uint32) {
+func draw(vaoSlice []uint32, window *glfw.Window, program uint32) {
 	gl.Clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT)
 	gl.UseProgram(program)
 
-	gl.BindVertexArray(vao)
-	gl.DrawArrays(gl.TRIANGLES, 0, int32(len(triangle)/3))
+	for _, vao := range(vaoSlice){
+		gl.BindVertexArray(vao)
+		gl.DrawArrays(gl.TRIANGLES, 0, int32(len(triangle1)/3))
+	}
 
 	glfw.PollEvents()
 	window.SwapBuffers()
